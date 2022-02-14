@@ -1,8 +1,4 @@
 steps:
-  # Download the model to embed it into the image
-  # - name: 'gcr.io/cloud-builders/gsutil'
-  #   args: ['cp','-r', 'gs://machine-learning-samples/models/sentiment/model', '.']
-  #   id: 'download-model'
   # TODO: Fix the fact that this gc project name is hardcoded right now
   # Build the container image
   - name: "gcr.io/cloud-builders/docker"
@@ -18,7 +14,7 @@ steps:
         "beta",
         "run",
         "deploy",
-        "model_api",
+        "model-api",
         "--image",
         "gcr.io/spacydrugner/model_api",
         "--region",
@@ -33,17 +29,5 @@ steps:
         "--update-env-vars",
         "WANDB_API_KEY=${_WANDB_API_KEY}",
       ]
-    # secretEnv:
-    #   - "WANDB_API_KEY"
-    # env:
-    #   - DEBUG=True
-    #   - LOCAL_MODEL_DIR='./ml/model/'
-    #   - LOCAL_MODEL_NAME='imdb_sen_model'
-    #   - MODEL_VERSION='latest'
-    #   - MODEL_LOADER='transformers'
 images:
   - gcr.io/spacydrugner/model_api
-# availableSecrets:
-#   secretManager:
-#     - env: "WANDB_API_KEY"
-#       versionName: projects/385692184392/secrets/ash0ts-wandb/versions/latest
