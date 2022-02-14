@@ -45,50 +45,6 @@ For brevity's sake I did not include the abstraction in this [`cloudbuild.yaml`]
 
 ![alt text](./static/images/public-api-result.png)
 
-#### WANDB Dashboard
-
-![alt text](./static/images/wandb-dashboard-1.png)
-![alt text](./static/images/wandb-dashboard-2.png)
-
-## Development Requirements
-
-- Python3.9.2
-- Pip
-- Poetry (Python Package Manager)
-
-### M.L Model Environment
-
-```sh
-LOCAL_MODEL_DIR = config("LOCAL_MODEL_DIR", default="./ml/model/")
-LOCAL_MODEL_NAME = config("LOCAL_MODEL_NAME", default="model.pkl")
-MODEL_VERSION = config("MODEL_VERSION", default="latest")
-MODEL_LOADER = config("MODEL_LOADER", default="joblib")
-WANDB_API_KEY=<API_KEY>
-```
-
-### M.L. Model Flavors
-
-[Currently we only have added](app/core/model_loaders.py)
-
-```sh
-joblib.load
-tf.keras.models.load_model
-TFDistilBertForSequenceClassification.from_pretrained
-```
-
-### Update `core.events` in `main.py`
-
-In `main.py` we reference a `startup` handler which we imported from `core.events` [(shown here)](app/core/events.py).
-This runs on startup of the application.
-
-On startup we use [Weights & Biases](https://wandb.ai/) to pull `LOCAL_MODEL_NAME` from their service and then use `MODEL_LOADER` to load the model before serving the application endpoints.
-
-### Update `/predict`
-
-To update your machine learning model, add your `load` and `method` [change here](app/api/routes/predictor.py) at `predictor.py`.
-
-We adapted the predictor model loader based on `joblib` overwrote the predict function to better suit our `TFDistilBertForSequenceClassification` model.
-
 ### Installation
 
 ```sh
