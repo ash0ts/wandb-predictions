@@ -1,0 +1,49 @@
+steps:
+  # Download the model to embed it into the image
+  # - name: 'gcr.io/cloud-builders/gsutil'
+  #   args: ['cp','-r', 'gs://machine-learning-samples/models/sentiment/model', '.']
+  #   id: 'download-model'
+  # TODO: Fix the fact that this gc project name is hardcoded right now
+  # Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/spacydrugner/model_api", "."]
+    # waitFor: ['download-model']
+  # Push the container image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/spacydrugner/model_api"]
+  # Deploy container image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "beta",
+        "run",
+        "deploy",
+        "model_api",
+        "--image",
+        "gcr.io/spacydrugner/model_api",
+        "--region",
+        "us-east1",
+        "--platform",
+        "managed",
+        "--memory",
+        "3000Mi",
+        "--allow-unauthenticated",
+        "--max-instances",
+        "5",
+        "--update-env-vars",
+        "WANDB_API_KEY=${_WANDB_API_KEY}",
+      ]
+    # secretEnv:
+    #   - "WANDB_API_KEY"
+    # env:
+    #   - DEBUG=True
+    #   - LOCAL_MODEL_DIR='./ml/model/'
+    #   - LOCAL_MODEL_NAME='imdb_sen_model'
+    #   - MODEL_VERSION='latest'
+    #   - MODEL_LOADER='transformers'
+images:
+  - gcr.io/spacydrugner/model_api
+# availableSecrets:
+#   secretManager:
+#     - env: "WANDB_API_KEY"
+#       versionName: projects/385692184392/secrets/ash0ts-wandb/versions/latest

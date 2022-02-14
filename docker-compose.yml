@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  wandb_api:
+    build: .
+    ports:
+      - ${PORT:-5000}:${PORT:-5000}
+    env_file:
+      - .env
