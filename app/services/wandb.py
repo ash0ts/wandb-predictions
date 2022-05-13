@@ -3,6 +3,7 @@ from pathlib import Path
 
 from core.config import (MODEL_ARTIFACT_NAME, MODEL_ARTIFACT_VERSION,
                          WANDB_ENTITY, WANDB_PROJECT_NAME)
+from core.utils import logging_wrap
 from loguru import logger
 
 import wandb
@@ -10,22 +11,22 @@ import wandb
 
 class WANDB_MODEL(object):
 
-    model_art_path = None
-    deployment_artifacts_path = None
-    model_path = None
+    def __init__(self):
 
-    model = None
-    deployment = None
+        self.model_art_path = None
+        self.deployment_artifacts_path = None
+        self.model_path = None
 
-    load_model = None
-    predict = None
+        self.model = None
+        self.deployment = None
 
-    Request = None
-    Response = None
+        self.load_model = None
+        self.predict = None
 
-    # (1)
-    @classmethod
-    def download_latest_model(cls):
+        self.Request = None
+        self.Response = None
+
+    def download_latest_model(self):
 
         # TODO: pass information about the download operation here
         wandb_art_path = str(Path(WANDB_ENTITY, WANDB_PROJECT_NAME,
@@ -33,25 +34,18 @@ class WANDB_MODEL(object):
         run = wandb.init(project=WANDB_PROJECT_NAME,
                          name="download-model", job_type="deployment")
         wandb_art_path = f"{WANDB_ENTITY}/{WANDB_PROJECT_NAME}/{MODEL_ARTIFACT_NAME}:{MODEL_ARTIFACT_VERSION}"
-        logger.info(wandb_art_path)
         model_art = run.use_artifact(wandb_art_path)
-        model_art_path = cls.model_art_path = model_art.download()
-        logger.info(cls.model_art_path)
-        logger.info(os.path.exists(cls.model_art_path))
-        cls.deployment_artifacts_path = os.path.join(
-            model_art_path, "deployment")
-        cls.model_path = os.path.join(model_art_path, 'promoted_model')
-        logger.info(cls.model_path)
-        logger.info(os.path.exists(cls.model_path))
+        model_art_path = self.model_art_path = model_art.download()
 
-        logger.info(os.path.join(cls.model_path, "model.pkl"))
-        logger.info(os.path.exists(os.path.join(cls.model_path, "model.pkl")))
+        self.deployment_artifacts_path = os.path.join(
+            model_art_path, "deployment")
+        self.model_path = os.path.join(model_art_path, 'promoted_model')
+
         run.finish()
         return None
 
     # (2)
-    @classmethod
-    def install(cls):
+    def install(self):
         import os
         import subprocess
         import sys
@@ -61,33 +55,34 @@ class WANDB_MODEL(object):
             'pip',
             'install',
             '-r',
-            os.path.join(cls.deployment_artifacts_path, 'requirements.txt'),
+            os.path.join(self.deployment_artifacts_path, 'requirements.txt'),
             '--no-cache-dir'
         ]
 
         subprocess.check_call(command)
 
     # (3)
-    @classmethod
-    def set_deployment_code(cls):
+    def set_deployment_code(self):
         from importlib.machinery import SourceFileLoader
 
         # imports the module from the given path
-        deployment = cls.deployment = SourceFileLoader("predict", os.path.join(
-            cls.deployment_artifacts_path, "predict.py")).load_module()
+        deployment = self.deployment = SourceFileLoader("predict", os.path.join(
+            self.deployment_artifacts_path, "predict.py")).load_module()
 
-        cls.load_wandb_model = deployment.load_wandb_model
-        cls.predict = deployment.predict
+        # self.load_wandb_model = logging_wrap(deployment.load_wandb_model)
+        # self.predict = logging_wrap(deployment.predict)
 
-        cls.Request = deployment.Request
-        cls.Response = deployment.Response
+        self.load_wandb_model = deployment.load_wandb_model
+        self.predict = deployment.predict
+
+        self.Request = deployment.Request
+        self.Response = deployment.Response
 
         return None
 
     # (4)
-    @classmethod
-    def set_model(cls):
-        cls.model = cls.load_wandb_model(cls.model_path)
+    def set_model(self):
+        self.model = self.load_wandb_model(self.model_path)
 
 
 def create_model():

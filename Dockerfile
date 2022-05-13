@@ -9,9 +9,14 @@ ENV APP_HOME /app
 WORKDIR ${APP_HOME}
 
 COPY Pipfile Pipfile.lock ./
-RUN pip3 install --upgrade pip
-RUN pip3 install pipenv
-RUN pipenv install --system --deploy
+RUN --mount=type=cache,target=/root/.cache pip3 install --upgrade pip
+RUN --mount=type=cache,target=/root/.cache pip3 install pipenv
+RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
+
+#TODO: Remove this when we have a proper build process
+RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
+#BUG: need to pass in WANDB API or use docker compose here
+
 
 COPY app ./
 

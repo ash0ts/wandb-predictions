@@ -1,11 +1,12 @@
-from typing import Any
+# from typing import Any, List
 
-from core.errors import PredictException
+# from core.errors import PredictException
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 from models.prediction import HealthResponse
 
 
+# TODO: Use type dispatch to ensure the response is well formed for FastAPI and the provided model response
 def create_prediction_router(model) -> APIRouter:
     # from services.wandb import WANDB_MODEL as model
 
@@ -15,10 +16,11 @@ def create_prediction_router(model) -> APIRouter:
     logger.info(model.Response)
     logger.info(model.Request)
 
-    @router.get("/predict", name="predict:get-data", response_model=model.Response)
+    @router.post("/predict", name="predict:make-prediction", response_model=model.Response)
     # async def predict(request: BERTSentimentRequest):
     async def predict(request: model.Request):
         # text = request.text
+        logger.info(request)
         request_dict = request.dict()
         # if not request:
         if not request:
