@@ -10,6 +10,7 @@ python-dotenv = "*"
 loguru = "*"
 uvicorn = "*"
 gunicorn = "*"
+prometheus-fastapi-instrumentator = "*"
 
 [dev-packages]
 flake8 = "*"

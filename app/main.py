@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.exceptions import HTTPException
 
 from core.config import API_PREFIX, DEBUG, VERSION, WANDB_PROJECT_NAME
@@ -21,7 +22,7 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
-
+Instrumentator().instrument(app).expose(app)
 
 # TODO: Read port from environ?
 if __name__ == "__main__":
