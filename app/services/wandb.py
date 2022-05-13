@@ -20,6 +20,9 @@ class WANDB_MODEL(object):
     load_model = None
     predict = None
 
+    Request = None
+    Response = None
+
     # (1)
     @classmethod
     def download_latest_model(cls):
@@ -33,9 +36,16 @@ class WANDB_MODEL(object):
         logger.info(wandb_art_path)
         model_art = run.use_artifact(wandb_art_path)
         model_art_path = cls.model_art_path = model_art.download()
+        logger.info(cls.model_art_path)
+        logger.info(os.path.exists(cls.model_art_path))
         cls.deployment_artifacts_path = os.path.join(
             model_art_path, "deployment")
         cls.model_path = os.path.join(model_art_path, 'promoted_model')
+        logger.info(cls.model_path)
+        logger.info(os.path.exists(cls.model_path))
+
+        logger.info(os.path.join(cls.model_path, "model.pkl"))
+        logger.info(os.path.exists(os.path.join(cls.model_path, "model.pkl")))
         run.finish()
         return None
 
@@ -50,8 +60,9 @@ class WANDB_MODEL(object):
             '-m',
             'pip',
             'install',
-            '--requirement',
-            os.path.join(cls.deployment_artifacts_path, 'requirements.txt')
+            '-r',
+            os.path.join(cls.deployment_artifacts_path, 'requirements.txt'),
+            '--no-cache-dir'
         ]
 
         subprocess.check_call(command)
@@ -64,11 +75,25 @@ class WANDB_MODEL(object):
         # imports the module from the given path
         deployment = cls.deployment = SourceFileLoader("predict", os.path.join(
             cls.deployment_artifacts_path, "predict.py")).load_module()
-        cls.load_model = deployment.load_model
+
+        cls.load_wandb_model = deployment.load_wandb_model
         cls.predict = deployment.predict
+
+        cls.Request = deployment.Request
+        cls.Response = deployment.Response
+
         return None
 
     # (4)
     @classmethod
     def set_model(cls):
-        cls.model = cls.load_model(cls.model_path)
+        cls.model = cls.load_wandb_model(cls.model_path)
+
+
+def create_model():
+    model = WANDB_MODEL()
+    model.download_latest_model()
+    model.install()
+    model.set_deployment_code()
+    model.set_model()
+    return model

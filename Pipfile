@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+wandb = "*"
+fastapi = "*"
+python-dotenv = "*"
+loguru = "*"
+uvicorn = "*"
+gunicorn = "*"
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3.9"

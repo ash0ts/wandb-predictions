@@ -8,23 +8,17 @@ ENV GROUP_ID=1000 \
 ENV APP_HOME /app
 WORKDIR ${APP_HOME}
 
-# COPY poetry.lock pyproject.toml ./
-# RUN pip3 install --upgrade pip && \
-#     pip3 install poetry && \
-#     poetry config virtualenvs.create false && \
-#     poetry install --no-dev
-
-COPY requirements.txt ./
+COPY Pipfile Pipfile.lock ./
 RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
-RUN pip3 install gunicorn
+RUN pip3 install pipenv
+RUN pipenv install --system --deploy
 
-COPY . ./
+COPY app ./
 
 # Default env variables for imdb model. Can set and override from cloudbuild
 ENV DEBUG=True
 ENV WANDB_ENTITY="a-sh0ts"
-ENV WANDB_PROJECT_NAME="ner_drugs"
+ENV WANDB_PROJECT_NAME="kaggle-tps-mar-2022-odsc"
 ENV MODEL_ARTIFACT_NAME="promoted_model"
 ENV MODEL_ARTIFACT_VERSION="latest"
 

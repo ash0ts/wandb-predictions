@@ -4,25 +4,24 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-# from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.exceptions import HTTPException
 
-from api.routes.api import router as api_router
 from core.config import API_PREFIX, DEBUG, VERSION, WANDB_PROJECT_NAME
 from core.events import preload_model_from_wandb
+from services.wandb import create_model
 
 
 def get_application() -> FastAPI:
     application = FastAPI(title=WANDB_PROJECT_NAME,
                           debug=DEBUG, version=VERSION)
-    application.include_router(api_router, prefix=API_PREFIX)
+    # preload_model_from_wandb(application)
     application.add_event_handler(
         "startup", preload_model_from_wandb(application))
     return application
 
 
 app = get_application()
-# Instrumentator().instrument(app).expose(app)
+
 
 # TODO: Read port from environ?
 if __name__ == "__main__":
