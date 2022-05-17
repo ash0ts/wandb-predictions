@@ -1,8 +1,8 @@
 # from typing import Any, List
 
 # from core.errors import PredictException
+from core.logging import new_logger as logger
 from fastapi import APIRouter, HTTPException
-from loguru import logger
 from models.prediction import HealthResponse
 
 

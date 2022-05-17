@@ -11,7 +11,9 @@ WORKDIR ${APP_HOME}
 COPY Pipfile Pipfile.lock ./
 RUN --mount=type=cache,target=/root/.cache pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache pip3 install pipenv
-RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
+
+RUN pipenv install --system --deploy
+# RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
 
 #TODO: Remove this when we have a proper build process
 RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
@@ -29,5 +31,6 @@ ENV MODEL_ARTIFACT_VERSION="latest"
 
 ENV PYTHONPATH app
 
-CMD uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}
+CMD python main.py
+# CMD uvicorn main:app --host=0.0.0.0 --port=8000
 # CMD exec gunicorn --bind :${PORT:-5000} --workers 1 --worker-class uvicorn.workers.UvicornWorker  --threads 8 main:app
