@@ -5,7 +5,8 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, Request
 
-from core.config import API_PREFIX, DEBUG, VERSION, WANDB_PROJECT_NAME
+from core.config import (API_PREFIX, CUSTOM_LOGGER, DEBUG, VERSION,
+                         WANDB_PROJECT_NAME)
 from core.events import preload_model_from_wandb
 from core.logging import new_logger as logger
 from services.prometheus import PrometheusMiddleware, metrics, setting_otlp
@@ -29,7 +30,7 @@ def get_application() -> FastAPI:
 app = get_application()
 
 # Setting metrics middleware
-logger.error(APP_NAME)
+logger.info(APP_NAME)
 app.add_middleware(PrometheusMiddleware, app_name=APP_NAME)
 app.add_route("/metrics", metrics)
 

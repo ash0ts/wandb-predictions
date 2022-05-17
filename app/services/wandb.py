@@ -3,10 +3,10 @@ from pathlib import Path
 
 from core.config import (MODEL_ARTIFACT_NAME, MODEL_ARTIFACT_VERSION,
                          WANDB_ENTITY, WANDB_PROJECT_NAME)
-# from core.logging import logging_wrap
-from core.logging import new_logger as logger
 
 import wandb
+
+# from core.logging import logging_wrap
 
 
 class WANDB_MODEL(object):
@@ -92,5 +92,4 @@ def create_model():
     model.install()
     model.set_deployment_code()
     model.set_model()
-    logger.info("Model created")
     return model

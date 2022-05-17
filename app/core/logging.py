@@ -4,7 +4,7 @@ import logging
 import sys
 from pathlib import Path
 
-from loguru import logger
+from core.config import CUSTOM_LOGGER
 
 # class InterceptHandler(logging.Handler):
 #     def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover
@@ -22,95 +22,100 @@ def logging_wrap(foo):
     return _
 
 
-class InterceptHandler(logging.Handler):
-    loglevel_mapping = {
-        50: 'CRITICAL',
-        40: 'ERROR',
-        30: 'WARNING',
-        20: 'INFO',
-        10: 'DEBUG',
-        0: 'NOTSET',
-    }
+if CUSTOM_LOGGER:
 
-    def emit(self, record):
-        try:
-            level = logger.level(record.levelname).name
-        except AttributeError:
-            level = self.loglevel_mapping[record.levelno]
+    from loguru import logger
 
-        frame, depth = logging.currentframe(), 2
-        while frame.f_code.co_filename == logging.__file__:
-            frame = frame.f_back
-            depth += 1
+    class InterceptHandler(logging.Handler):
+        loglevel_mapping = {
+            50: 'CRITICAL',
+            40: 'ERROR',
+            30: 'WARNING',
+            20: 'INFO',
+            10: 'DEBUG',
+            0: 'NOTSET',
+        }
 
-        log = logger.bind(request_id='app')
-        log.opt(
-            depth=depth,
-            exception=record.exc_info
-        ).log(level, record.getMessage())
+        def emit(self, record):
+            try:
+                level = logger.level(record.levelname).name
+            except AttributeError:
+                level = self.loglevel_mapping[record.levelno]
 
+            frame, depth = logging.currentframe(), 2
+            while frame.f_code.co_filename == logging.__file__:
+                frame = frame.f_back
+                depth += 1
 
-class CustomizeLogger:
+            log = logger.bind(request_id='app')
+            log.opt(
+                depth=depth,
+                exception=record.exc_info
+            ).log(level, record.getMessage())
 
-    @classmethod
-    def make_logger(cls, config_path: Path):
+    class CustomizeLogger:
 
-        config = cls.load_logging_config(config_path)
-        logging_config = config.get('logger')
+        @classmethod
+        def make_logger(cls, config_path: Path):
 
-        logger = cls.customize_logging(
-            logging_config.get('path'),
-            level=logging_config.get('level'),
-            retention=logging_config.get('retention'),
-            rotation=logging_config.get('rotation'),
-            # format=logging_config.get('format')
-        )
-        return logger
+            config = cls.load_logging_config(config_path)
+            logging_config = config.get('logger')
 
-    @classmethod
-    def customize_logging(cls,
-                          filepath: Path,
-                          level: str,
-                          rotation: str,
-                          retention: str,
-                          #   format: str
-                          ):
+            logger = cls.customize_logging(
+                logging_config.get('path'),
+                level=logging_config.get('level'),
+                retention=logging_config.get('retention'),
+                rotation=logging_config.get('rotation'),
+                # format=logging_config.get('format')
+            )
+            return logger
 
-        logger.remove()
-        logger.add(
-            sys.stdout,
-            enqueue=True,
-            backtrace=True,
-            level=level.upper(),
-            # format=format
-        )
-        logger.add(
-            str(filepath),
-            rotation=rotation,
-            retention=retention,
-            enqueue=True,
-            backtrace=True,
-            level=level.upper(),
-            # format=format
-        )
-        logging.basicConfig(handlers=[InterceptHandler()], level=0)
-        logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
-        for _log in ['uvicorn',
-                     'uvicorn.error',
-                     'fastapi'
-                     ]:
-            _logger = logging.getLogger(_log)
-            _logger.handlers = [InterceptHandler()]
+        @classmethod
+        def customize_logging(cls,
+                              filepath: Path,
+                              level: str,
+                              rotation: str,
+                              retention: str,
+                              #   format: str
+                              ):
 
-        return logger.bind(request_id=None, method=None)
+            logger.remove()
+            logger.add(
+                sys.stdout,
+                enqueue=True,
+                backtrace=True,
+                level=level.upper(),
+                # format=format
+            )
+            logger.add(
+                str(filepath),
+                rotation=rotation,
+                retention=retention,
+                enqueue=True,
+                backtrace=True,
+                level=level.upper(),
+                # format=format
+            )
+            logging.basicConfig(handlers=[InterceptHandler()], level=0)
+            logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
+            for _log in ['uvicorn',
+                         'uvicorn.error',
+                         'fastapi'
+                         ]:
+                _logger = logging.getLogger(_log)
+                _logger.handlers = [InterceptHandler()]
 
-    @classmethod
-    def load_logging_config(cls, config_path):
-        config = None
-        with open(config_path) as config_file:
-            config = json.load(config_file)
-        return config
+            return logger.bind(request_id=None, method=None)
 
+        @classmethod
+        def load_logging_config(cls, config_path):
+            config = None
+            with open(config_path) as config_file:
+                config = json.load(config_file)
+            return config
 
-new_logger = CustomizeLogger.make_logger(
-    Path(Path(__file__).resolve().parent, "logging_config.json"))
+    new_logger = CustomizeLogger.make_logger(
+        Path(Path(__file__).resolve().parent, "logging_config.json"))
+else:
+    import logging
+    new_logger = logging

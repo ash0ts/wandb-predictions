@@ -16,3 +16,6 @@ MODEL_ARTIFACT_NAME = config("MODEL_ARTIFACT_NAME")
 MODEL_ARTIFACT_VERSION = config("MODEL_ARTIFACT_VERSION")
 
 IMAGE_PREDICTOR = config("IMAGE_PREDICTOR", cast=bool, default=False)
+
+# TODO: Remove this and choose one logger. Loguru breaks tensorflow right now
+CUSTOM_LOGGER = config("DISABLE_LOGGER", cast=bool, default=True)

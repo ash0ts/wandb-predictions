@@ -16,7 +16,8 @@ RUN --mount=type=cache,target=/root/.cache pip3 install pipenv
 RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
 
 #TODO: Remove this when we have a proper build process
-RUN --mount=type=cache,target=/root/.cache pip3 install spacy
+# RUN --mount=type=cache,target=/root/.cache pip3 install tensorflow==2.8.0
+# RUN --mount=type=cache,target=/root/.cache pip3 install spacy
 # RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
 #BUG: need to pass in WANDB API or use docker compose here
 
