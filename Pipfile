@@ -16,6 +16,8 @@ opentelemetry-instrumentation-logging = "*"
 opentelemetry-exporter-otlp = "*"
 opentelemetry-api = "*"
 opentelemetry-sdk = "*"
+pillow = "*"
+python-multipart = "*"
 
 [dev-packages]
 flake8 = "*"

@@ -12,11 +12,12 @@ COPY Pipfile Pipfile.lock ./
 RUN --mount=type=cache,target=/root/.cache pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache pip3 install pipenv
 
-RUN pipenv install --system --deploy
-# RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
+# RUN pipenv install --system --deploy
+RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
 
 #TODO: Remove this when we have a proper build process
-RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
+RUN --mount=type=cache,target=/root/.cache pip3 install spacy
+# RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
 #BUG: need to pass in WANDB API or use docker compose here
 
 
@@ -28,6 +29,7 @@ ENV WANDB_ENTITY="a-sh0ts"
 ENV WANDB_PROJECT_NAME="kaggle-tps-mar-2022-odsc"
 ENV MODEL_ARTIFACT_NAME="promoted_model"
 ENV MODEL_ARTIFACT_VERSION="latest"
+ENV IMAGE_PREDICTOR=false
 
 ENV PYTHONPATH app
 
