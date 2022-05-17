@@ -10,6 +10,7 @@ from core.events import preload_model_from_wandb
 from core.logging import new_logger as logger
 from services.prometheus import PrometheusMiddleware, metrics, setting_otlp
 
+# TODO: move these to config and import from there
 APP_NAME = os.environ.get("APP_NAME", "app")
 EXPOSE_PORT = os.environ.get("EXPOSE_PORT", 8000)
 OTLP_GRPC_ENDPOINT = os.environ.get("OTLP_GRPC_ENDPOINT", "http://tempo:4317")

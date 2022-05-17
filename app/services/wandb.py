@@ -75,6 +75,7 @@ class WANDB_MODEL(object):
         self.load_wandb_model = deployment.load_wandb_model
         self.predict = deployment.predict
 
+        # TODO: more graceful handling of errors that would be induced if not supplied with pydantic model esp wrt to uploaded file based predictors
         self.Request = deployment.Request
         self.Response = deployment.Response
 
