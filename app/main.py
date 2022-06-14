@@ -5,8 +5,8 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, Request
 
-from core.config import (API_PREFIX, CUSTOM_LOGGER, DEBUG, VERSION,
-                         WANDB_PROJECT_NAME)
+from core.config import (API_PREFIX, CUSTOM_LOGGER, DEBUG,
+                         FROM_WANDB_PROJECT_NAME, VERSION)
 from core.events import preload_model_from_wandb
 from core.logging import new_logger as logger
 from services.prometheus import PrometheusMiddleware, metrics, setting_otlp
@@ -18,7 +18,7 @@ OTLP_GRPC_ENDPOINT = os.environ.get("OTLP_GRPC_ENDPOINT", "http://tempo:4317")
 
 
 def get_application() -> FastAPI:
-    application = FastAPI(title=WANDB_PROJECT_NAME,
+    application = FastAPI(title=FROM_WANDB_PROJECT_NAME,
                           debug=DEBUG, version=VERSION)
     # preload_model_from_wandb(application)
     application.add_event_handler(

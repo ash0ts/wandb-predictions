@@ -11,11 +11,12 @@ MIN_CONNECTIONS_COUNT: int = config(
     "MIN_CONNECTIONS_COUNT", cast=int, default=10)
 
 WANDB_ENTITY = config("WANDB_ENTITY")
-WANDB_PROJECT_NAME = config("WANDB_PROJECT_NAME")
+FROM_WANDB_PROJECT_NAME = config("FROM_WANDB_PROJECT_NAME")
+TO_WANDB_PROJECT_NAME = config("TO_WANDB_PROJECT_NAME")
 MODEL_ARTIFACT_NAME = config("MODEL_ARTIFACT_NAME")
 MODEL_ARTIFACT_VERSION = config("MODEL_ARTIFACT_VERSION")
 
 IMAGE_PREDICTOR = config("IMAGE_PREDICTOR", cast=bool, default=False)
 
 # TODO: Remove this and choose one logger. Loguru breaks tensorflow right now
-CUSTOM_LOGGER = config("DISABLE_LOGGER", cast=bool, default=True)
+CUSTOM_LOGGER = config("DISABLE_LOGGER", cast=bool, default=False)

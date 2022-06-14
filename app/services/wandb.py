@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
 
-from core.config import (MODEL_ARTIFACT_NAME, MODEL_ARTIFACT_VERSION,
-                         WANDB_ENTITY, WANDB_PROJECT_NAME)
+from core.config import (FROM_WANDB_PROJECT_NAME, MODEL_ARTIFACT_NAME,
+                         MODEL_ARTIFACT_VERSION, TO_WANDB_PROJECT_NAME,
+                         WANDB_ENTITY)
 
 import wandb
 
@@ -29,17 +30,17 @@ class WANDB_MODEL(object):
     def download_latest_model(self):
 
         # TODO: pass information about the download operation here
-        wandb_art_path = str(Path(WANDB_ENTITY, WANDB_PROJECT_NAME,
+        wandb_art_path = str(Path(WANDB_ENTITY, FROM_WANDB_PROJECT_NAME,
                                   MODEL_ARTIFACT_NAME, MODEL_ARTIFACT_VERSION))
-        run = wandb.init(project=WANDB_PROJECT_NAME,
-                         name="download-model", job_type="deployment")
-        wandb_art_path = f"{WANDB_ENTITY}/{WANDB_PROJECT_NAME}/{MODEL_ARTIFACT_NAME}:{MODEL_ARTIFACT_VERSION}"
+        run = wandb.init(project=TO_WANDB_PROJECT_NAME, job_type="download",
+                         name=f"download-{MODEL_ARTIFACT_NAME}", tags=["download"])
+        wandb_art_path = f"{WANDB_ENTITY}/{FROM_WANDB_PROJECT_NAME}/{MODEL_ARTIFACT_NAME}:{MODEL_ARTIFACT_VERSION}"
         model_art = run.use_artifact(wandb_art_path)
         model_art_path = self.model_art_path = model_art.download()
 
         self.deployment_artifacts_path = os.path.join(
-            model_art_path, "deployment")
-        self.model_path = os.path.join(model_art_path, 'promoted_model')
+            model_art_path, "deployment_assets")
+        self.model_path = os.path.join(model_art_path, 'model')
 
         run.finish()
         return None

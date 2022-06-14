@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache pipenv install --system --deploy
 
 #TODO: Remove this when we have a proper build process
 # RUN --mount=type=cache,target=/root/.cache pip3 install tensorflow==2.8.0
-# RUN --mount=type=cache,target=/root/.cache pip3 install spacy
+RUN --mount=type=cache,target=/root/.cache pip3 install spacy
 # RUN --mount=type=cache,target=/root/.cache pip3 install pycaret
 #BUG: need to pass in WANDB API or use docker compose here
 
@@ -27,10 +27,12 @@ COPY app ./
 # Default env variables for imdb model. Can set and override from cloudbuild
 ENV DEBUG=True
 ENV WANDB_ENTITY="a-sh0ts"
-ENV WANDB_PROJECT_NAME="kaggle-tps-mar-2022-odsc"
-ENV MODEL_ARTIFACT_NAME="promoted_model"
+ENV FROM_WANDB_PROJECT_NAME="pip-demo->drug-ner-spacy"
+ENV TO_WANDB_PROJECT_NAME="pip-demo->deployment-monitor"
+ENV MODEL_ARTIFACT_NAME="drug-ner-spacy-model"
 ENV MODEL_ARTIFACT_VERSION="latest"
 ENV IMAGE_PREDICTOR=false
+ENV CUSTOM_LOGGER=true
 
 ENV PYTHONPATH app
 
